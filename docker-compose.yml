@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  honeypot-monitor:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ssh-honeypot-monitor
+    restart: always
+    
+    # Mount the host's SSH auth log
+    volumes:
+      - /var/log/auth.log:/var/log/auth.log:ro
+      - honeypot-output:/var/log/honeypot-monitor
+    
+    # Logging configuration
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "10"
+    
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+
+volumes:
+  honeypot-output:
+    driver: local
